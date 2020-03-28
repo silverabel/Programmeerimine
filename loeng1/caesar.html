@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+	<meta charset="utf-8">
+	<title>Caesari salakiri</title>
+	<style>
+		
+	</style>
+	
+</head>
+<body>
+	Vali samm, millega krüpteerida (positiivsed arvud liigutavad paremale ja negatiivsed vasakule)
+	<input id="samm" type="number" step="1" columns="3" min="-420" max="69"><br>
+	<textarea id="sisestatudTekst" rows="10" columns="10" placeholder="Kirjuta siia tekst, mida soovid krüpteerida"></textarea>
+	<textarea id="krüpteeritudTekst" rows="10" columns="10" placeholder="Siia tuleb krüpteeritud tekst"></textarea><br>
+	<input type="submit" value="Lisa" onclick="lisaTekstMassiivi()">
+	<input type="submit" value="Väljasta kogu krüpteeritud tekst" onclick="väljastaKrüpteeritudTekst()"><br><br>
+
+	<pre id="tekstiVäljastus"></pre>
+	
+
+	<script>
+		function krüpteeriTekst(tekst, samm) {
+			// kui samm on liiga suur, teeme niiöelda ringi peale
+			if (samm >= 26 || samm <= -26) {
+				samm = samm - Math.floor(samm / 26) * 26;
+			}
+			var krüpteeritudTekst = "";
+			var krüpteeritudTäht;
+			var täheASCII;
+			var sümbol;
+			// käime teksti sümbolhaaval läbi, kui sümbol on täht, krüpteerime ja lisame krüpteeritudTekst-ile; kui pole täht, lisame lihtsalt sümboli
+			for (var i = 0; i < tekst.length; i++) {
+				sümbol = tekst.charAt(i);
+				krüpteeritudTäht = ""; // seda on vaja, et eelnev täht ei hakkaks segama
+				if (sümbol.toUpperCase() != sümbol.toLowerCase()) {  // nii olevat hea viis, kuidas kontrollida, kas on täht
+					täheASCII = sümbol.charCodeAt();
+					uusTäheASCII = täheASCII + samm;
+
+					if (uusTäheASCII < 65) uusTäheASCII += 26;
+					else if (uusTäheASCII > 122) uusTäheASCII -= 26;
+					else if (täheASCII <= 90 && uusTäheASCII > 90) uusTäheASCII -= 26;
+					else if (täheASCII >= 97 && uusTäheASCII < 97) uusTäheASCII += 26;
+					
+					krüpteeritudTäht = String.fromCharCode(uusTäheASCII);
+				}
+				if (krüpteeritudTäht) krüpteeritudTekst += krüpteeritudTäht;
+				else krüpteeritudTekst += sümbol;
+			}
+		return krüpteeritudTekst;
+		}
+
+		function kirjutaKrüpteeritudTekst() {
+			var sisestatudTekst = document.getElementById("sisestatudTekst").value;
+			var samm = Number(document.getElementById("samm").value);
+			var krüpteeritudTekst = krüpteeriTekst(sisestatudTekst, samm);
+			document.getElementById("krüpteeritudTekst").innerHTML = krüpteeritudTekst;
+		}
+
+		var tekstiMassiiv = [];
+		function lisaTekstMassiivi() {
+			var tekst = document.getElementById("krüpteeritudTekst").value;
+			tekstiMassiiv.push(tekst);
+			document.getElementById("krüpteeritudTekst").innerHTML = "";
+			document.getElementById("sisestatudTekst").value = "";
+		}
+
+		function väljastaKrüpteeritudTekst() {
+			document.getElementById("tekstiVäljastus").innerHTML = "";
+			tekstiMassiiv.forEach(tekstiOsa => {
+				console.log(tekstiOsa)
+				document.getElementById("tekstiVäljastus").innerHTML += (tekstiOsa + "<br>");
+			})
+		}
+
+
+		document.getElementById("sisestatudTekst").addEventListener("input", kirjutaKrüpteeritudTekst);
+		document.getElementById("samm").addEventListener("input", kirjutaKrüpteeritudTekst);
+	</script>
+</body>
+</html>
