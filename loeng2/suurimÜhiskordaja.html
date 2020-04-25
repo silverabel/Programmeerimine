@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+	<meta charset="utf-8">
+	<title>Suurim ühiskordaja</title>
+	<style>
+		
+	</style>
+	
+</head>
+<body>
+<input type="number" id="esimeneArv" placeholder="Esimene arv" onchange="väljastaSuurimÜhiskordaja()">
+<input type="number" id="teineArv" placeholder="Teine arv" onchange="väljastaSuurimÜhiskordaja()">
+
+<br>
+
+Suurim ühiskordaja: 
+<input type="number" id="suurimÜhiskordaja" disabled>
+
+<script>
+	function leiaKaheArvuSuurimÜhiskordaja(esimeneArv, teineArv) {
+		if (teineArv == 0 || esimeneArv == 0) return 0;
+		while (teineArv != 0) {
+			if (esimeneArv > teineArv) esimeneArv -= teineArv;
+			else teineArv -= esimeneArv;
+		}
+		return esimeneArv;
+	}
+
+	function väljastaSuurimÜhiskordaja() {
+		var esimeneArv = Math.floor(document.getElementById("esimeneArv").value);
+		if (esimeneArv < 0) esimeneArv = Math.abs(esimeneArv);
+		var teineArv = Math.floor(document.getElementById("teineArv").value);
+		if (teineArv < 0) teineArv = Math.abs(teineArv);
+		if (isNaN(esimeneArv) || isNaN(teineArv)) alert("tere");
+		var suurimÜhiskordaja = leiaKaheArvuSuurimÜhiskordaja(esimeneArv, teineArv);
+		document.getElementById("suurimÜhiskordaja").value = suurimÜhiskordaja;
+	}
+
+</script>
+</body>
+</html>

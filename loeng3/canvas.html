@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+	<meta charset="utf-8">
+	<title>Canvas</title>
+	<style>
+		
+	</style>
+	
+</head>
+<body>
+Mitu jäätist tahad? <input type="number" id="kordusteArv" min="-1" autofocus onchange="joonista()">
+(vajuta üles/alla nooli, klaviatuuril saab ka peal hoida)
+<input type="checkbox" id="panePöörlemaKast" onclick="panePöörlema(), näitaKiiruseMuutmist()">Pane pöörlema
+<span id="kiiruseMuutmine" style="display: none">
+	Muuda pöörlemise kiirust: 
+	<button onclick="suurendaPöörlemiseKiirust()">+</button>
+	<button onclick="vähendaPöörlemiseKiirust()">-</button>
+	<input type="number" id="pööramisNurk" value="6" hidden>
+</span>
+<br><br>
+<canvas id="canvas" width="800" height="600" style="border: 1px solid #000"></canvas>
+
+
+<script>
+var tahvel = document.getElementById("canvas");
+var ctx = tahvel.getContext("2d");
+
+ctx.translate(400, 300);
+
+ctx.textBaseline = "middle";
+ctx.font = "195px Georgia";
+
+var kordusteArvElement = document.getElementById("kordusteArv");
+var pööramisNurkElement = document.getElementById("pööramisNurk");
+
+function joonista(random = true) {
+	ctx.clearRect(-400, -300, 800, 600);
+
+	// kui random == false, siis paneme pildi sujuvalt pöörlema
+	var pööramisNurk = pööramisNurkElement.value;
+	// kui random == true ehk kui me ei pane olemasolevat pilti pöörlema, 
+	// siis pöörame ühe korra suvalise nurga võrra, et alguspunkt ei jääks tüütult alati ühte kohta
+	if (random == true) {
+		pööramisNurk = 360 * Math.random();
+	}
+	ctx.rotate(pööramisNurk * Math.PI / 180);
+	
+
+	var kordusteArv = Number(kordusteArvElement.value);
+
+	for (var i = 0; i < kordusteArv; i++) {
+		pööramisNurk = 360 / kordusteArv;
+		ctx.rotate(pööramisNurk * Math.PI / 180);
+		
+		ctx.strokeText("<}}", 0, 0);
+	}
+}
+
+var panePöörlemaKastElement = document.getElementById("panePöörlemaKast");
+
+function panePöörlema() {
+	if (panePöörlemaKastElement.checked == true) {
+		joonista(false);
+		setTimeout(panePöörlema, 17);
+	}
+}
+
+var kiiruseMuutmineElement = document.getElementById("kiiruseMuutmine");
+
+function näitaKiiruseMuutmist() {
+	if (panePöörlemaKastElement.checked == true) kiiruseMuutmineElement.style.display = "inline";
+	else kiiruseMuutmineElement.style.display = "none";
+};
+
+function suurendaPöörlemiseKiirust() {pööramisNurkElement.value = Number(pööramisNurkElement.value) + 1;}
+function vähendaPöörlemiseKiirust() {pööramisNurkElement.value -= 1;}
+
+
+kordusteArvElement.addEventListener("change", function() {
+	if (kordusteArvElement.value < 0) kordusteArvElement.value = 50; joonista();
+})
+
+
+
+
+
+</script>
+</body>
+</html>
