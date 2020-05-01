@@ -17,12 +17,16 @@ Mitu jäätist tahad? <input type="number" id="kordusteArv" min="-1" autofocus o
 	<button onclick="suurendaPöörlemiseKiirust()">+</button>
 	<button onclick="vähendaPöörlemiseKiirust()">-</button>
 	<input type="number" id="pööramisNurk" value="6" hidden>
+	<input type="number" id="jäätiseVärv" hidden>
+	<input type="text" id="värviValikuString" hidden>
 </span>
 <br><br>
 <canvas id="canvas" width="800" height="600" style="border: 1px solid #000"></canvas>
 
 
 <script>
+
+
 var tahvel = document.getElementById("canvas");
 var ctx = tahvel.getContext("2d");
 
@@ -33,28 +37,76 @@ ctx.font = "195px Georgia";
 
 var kordusteArvElement = document.getElementById("kordusteArv");
 var pööramisNurkElement = document.getElementById("pööramisNurk");
+var jäätiseVärvElement = document.getElementById("jäätiseVärv");
+var värviValikuStringElement = document.getElementById("värviValikuString");
 
 function joonista(random = true) {
 	ctx.clearRect(-400, -300, 800, 600);
 
+	
+
+	var värviValikuString = värviValikuStringElement.value;
+	
+
+
 	// kui random == false, siis paneme pildi sujuvalt pöörlema
 	var pööramisNurk = pööramisNurkElement.value;
+	var jäätiseVärv = Number(jäätiseVärvElement.value);
 	// kui random == true ehk kui me ei pane olemasolevat pilti pöörlema, 
 	// siis pöörame ühe korra suvalise nurga võrra, et alguspunkt ei jääks tüütult alati ühte kohta
 	if (random == true) {
 		pööramisNurk = 360 * Math.random();
+
+		var punaseVärviOsa = Math.floor(16 * Math.random());
+		var roheliseVärviOsa = Math.floor((16 - punaseVärviOsa / 8) * Math.random());
+		var siniseVärviOsa = Math.floor((16 - (punaseVärviOsa + roheliseVärviOsa) / 16) * Math.random());
+		jäätiseVärv = punaseVärviOsa * 256 + roheliseVärviOsa * 16 + siniseVärviOsa;
+		jäätiseVärvElement.value = jäätiseVärv;
+
+		värviValikuString = "";
 	}
+	
+	
 	ctx.rotate(pööramisNurk * Math.PI / 180);
 	
-
 	var kordusteArv = Number(kordusteArvElement.value);
+	pööramisNurk = 360 / kordusteArv;
+
+	var värviValikuLugeja = Math.floor(kordusteArv / 2) - 1;
 
 	for (var i = 0; i < kordusteArv; i++) {
-		pööramisNurk = 360 / kordusteArv;
+		var värviValik = värviValikuString[i];
+		if (random == true) värviValik = Math.floor(3 * Math.random());
+		var värviKüllastuvus = Number(Math.floor(jäätiseVärv / 256)) + Number(Math.floor((jäätiseVärv % 256) / 16)) + Number(jäätiseVärv % 16);
+		if (värviKüllastuvus > 40) värviValik = 3;
+		var jäätiseVärviMuutumiseKontroll = jäätiseVärv;
+		if (i < kordusteArv / 2) {
+			if (värviValik == 0 && jäätiseVärv < 3840) jäätiseVärv += 256;
+			if (värviValik == 1 && jäätiseVärv < 4080 && jäätiseVärv % 256 < 240) jäätiseVärv += 16;
+			if (värviValik == 2 && jäätiseVärv < 4095 && jäätiseVärv % 16 != 15) jäätiseVärv += 1;
+
+			if (jäätiseVärviMuutumiseKontroll != jäätiseVärv && random == true) värviValikuString += värviValik;
+			else if (random == true) värviValikuString += "3";
+		}
+		else {
+			if (värviValikuString[värviValikuLugeja] == 0 && Math.floor(jäätiseVärv / 256) != 0) jäätiseVärv -= 256;
+			if (värviValikuString[värviValikuLugeja] == 1 && jäätiseVärv % 256 > 15) jäätiseVärv -= 16;
+			if (värviValikuString[värviValikuLugeja] == 2 && jäätiseVärv % 16 != 0) jäätiseVärv -= 1;
+			värviValikuLugeja -= 1;
+		}
+
+		värviValikuStringElement.value = värviValikuString;
+
+		
+		
+		ctx.strokeStyle = "#" + jäätiseVärv.toString(16);
+		console.log(ctx.strokeStyle)
+
 		ctx.rotate(pööramisNurk * Math.PI / 180);
 		
 		ctx.strokeText("<}}", 0, 0);
 	}
+	console.log(värviValikuString)
 }
 
 var panePöörlemaKastElement = document.getElementById("panePöörlemaKast");
@@ -71,18 +123,26 @@ var kiiruseMuutmineElement = document.getElementById("kiiruseMuutmine");
 function näitaKiiruseMuutmist() {
 	if (panePöörlemaKastElement.checked == true) kiiruseMuutmineElement.style.display = "inline";
 	else kiiruseMuutmineElement.style.display = "none";
+	kordusteArvElement.focus();
 };
 
-function suurendaPöörlemiseKiirust() {pööramisNurkElement.value = Number(pööramisNurkElement.value) + 1;}
-function vähendaPöörlemiseKiirust() {pööramisNurkElement.value -= 1;}
+function suurendaPöörlemiseKiirust() {
+	pööramisNurkElement.value = Number(pööramisNurkElement.value) + 1;
+	kordusteArvElement.focus();
+}
+
+function vähendaPöörlemiseKiirust() {
+	pööramisNurkElement.value -= 1;
+	kordusteArvElement.focus();
+	}
+
+
+
 
 
 kordusteArvElement.addEventListener("change", function() {
 	if (kordusteArvElement.value < 0) kordusteArvElement.value = 50; joonista();
 })
-
-
-
 
 
 </script>
