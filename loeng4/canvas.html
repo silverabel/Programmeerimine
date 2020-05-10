@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+	<meta charset="utf-8">
+	<title>Canvas</title>
+	<style>
+		div.canvas {
+			border: 1px solid #000;
+			width: 800px;
+			height: 600px;
+		}
+		div.vasakpoolne {
+			float: left;	
+		}
+
+		#värvideVorm input {
+			-webkit-appearance: none;
+			background-color: black;
+			padding: 1em;
+			outline: 0.1em solid black;
+		}
+
+		#värvideVorm input:checked {
+			outline: 0.2em solid black;
+		}
+	</style>
+
+</head>
+<body>
+<div class="vasakpoolne">
+	<div class="canvas">
+		<canvas id="canvas" width="800" height="600" ></canvas>
+	</div>
+	<br>
+	Palli raadius: <input type="number" min="1" max="2000" id="palliRaadius" value="10" autofocus>
+</div>
+<form name="värvideVorm" id="värvideVorm">
+	<input type="radio" name="värvid" value="black" checked id="0">
+	<input type="radio" name="värvid" value="white" id="1">
+	<input type="radio" name="värvid" value="green" id="2">
+	<input type="radio" name="värvid" value="blue" id="3"><br>
+	<input type="radio" name="värvid" value="red" id="4">
+	<input type="radio" name="värvid" value="yellow" id="5">
+	<input type="radio" name="värvid" value="purple" id="6">
+	<input type="radio" name="värvid" value="orange" id="7"><br>
+	<input type="radio" name="värvid" value="pink" id="8">
+	<input type="radio" name="värvid" value="gray" id="9">
+	<input type="radio" name="värvid" value="brown" id="10"><br>
+	Värvi muutmiseks kliki kastil või vajuta TAB.
+</form>
+
+<script src="Pall.class.js"></script>
+<script>
+var tahvel = document.getElementById("canvas");
+var ctx = tahvel.getContext("2d");
+
+var palliRaadiusElement = document.getElementById("palliRaadius");
+var palliRaadius = palliRaadiusElement.value;
+ctx.lineWidth = 2 * palliRaadius;
+
+var pall = new Pall(200, 200, palliRaadius, ctx);
+
+var hiirAll = false;
+
+window.onmousedown = function(e) {
+	pall.x = e.clientX - tahvel.getBoundingClientRect().x;
+	pall.y = e.clientY - tahvel.getBoundingClientRect().y;
+
+	hiirAll = true;
+	pall.joonista();
+
+	palliRaadiusElement.focus();
+}
+
+window.onmousemove = function(e) {
+	if (!hiirAll) return;
+
+	eelmineX = pall.x;
+	eelmineY = pall.y;
+
+	pall.x = e.clientX - tahvel.getBoundingClientRect().x;
+	pall.y = e.clientY - tahvel.getBoundingClientRect().y;
+
+	ctx.beginPath();
+	ctx.moveTo(eelmineX, eelmineY);
+	ctx.lineTo(pall.x, pall.y);
+	ctx.stroke();
+
+	pall.joonista();
+
+	palliRaadiusElement.focus();
+}
+
+window.onmouseup = function() {
+	hiirAll = false;
+	palliRaadiusElement.focus();
+}
+
+palliRaadiusElement.onchange = function() {
+	pall.raadius = palliRaadiusElement.value;
+	ctx.lineWidth = 2 * pall.raadius;
+}
+
+var värviNupud = document.getElementsByName("värvid");
+värviNupud.forEach (värviNupp => värviNupp.style.backgroundColor = värviNupp.value);
+
+var checkedVärviNupp = 0;
+
+document.värvideVorm.onclick = function() {
+	var checkedVärviNuppElement = document.querySelector('input[name = värvid]:checked')
+	ctx.fillStyle = ctx.strokeStyle = checkedVärviNuppElement.value;
+	checkedVärviNupp = Number(checkedVärviNuppElement.id);
+}
+
+
+
+
+document.onkeydown = function(key) {
+	if (key.keyCode == 9) {
+		key.preventDefault();
+
+		if (checkedVärviNupp == värviNupud.length - 1) checkedVärviNupp = 0;
+		else checkedVärviNupp += 1;
+
+		värviNupud[checkedVärviNupp].checked = true;
+
+		ctx.fillStyle = ctx.strokeStyle = värviNupud[checkedVärviNupp].value;
+	}
+}
+
+</script>
+
+</body>
+</html>
