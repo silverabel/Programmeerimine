@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+	<meta charset="utf-8">
+	<title>Jalgrataste rent</title>
+	<style>
+		table, td, th {
+      border: 1px solid black;
+    }
+	</style>
+  <script src="Ratas.class.js" defer></script>
+  <script src="Laenutus.class.js" defer></script>
+  <script src="funktsioonid.js" defer></script>
+  <script src="testimine.js" defer></script>
+  <script src="kasutajaliides.js" defer></script>
+</head>
+<body>
+<p>Lisa rattaid laenutusse:</p>
+<select id="rattaLiik">
+  <option selected disabled>Ratta liik</option>
+  <option>Kross</option>
+  <option>Linn</option>
+  <option>Maastik</option>
+  <option>Muu</option>
+</select>
+<input type="number" placeholder="Päeva hind" id="päevaHind" min="0">
+<button onclick='lisaRatasLaenutusse(), document.getElementById("otsingLiigiJärgi").onchange()'>Lisa</button>
+
+<p>Otsi liigi järgi rattaid:</p>
+<select id="otsingLiigiJärgi">
+  <option selected disabled>Ratta liik</option>
+  <option>Kross</option>
+  <option>Linn</option>
+  <option>Maastik</option>
+  <option>Muu</option>
+</select>
+<table id="ratasteNimekiri">
+  <tr>
+    <th>Id</th>
+    <th>Päevahind</th>
+    <th>Saab laenutada</th>
+  </tr>
+</table>
+
+</body>
+</html>
